@@ -5,8 +5,7 @@ import logging
 import qrcode
 from pyhap.accessory import Accessory
 from pyhap.accessory_driver import AccessoryDriver
-from pyhap.const import CATEGORY_SENSOR
-
+from pyhap.const import CATEGORY_BRIDGE  # or CATEGORY_OTHER
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -15,18 +14,21 @@ logger = logging.getLogger(__name__)
 dht_device = adafruit_dht.DHT11(board.D4)  # Update GPIO pin if needed
 
 class TemperatureHumiditySensor(Accessory):
-    category = CATEGORY_SENSOR
+    category = CATEGORY_BRIDGE  # or CATEGORY_OTHER
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         logger.info("Initialising Temperature and Humidity sensor accessory")
 
-        # Add temperature and humidity services
+        # Add separate services for temperature and humidity
         temp_service = self.add_preload_service('TemperatureSensor')
         hum_service = self.add_preload_service('HumiditySensor')
-
-        # Get characteristics for temperature and humidity
+        
+        # Get characteristics for temperature
         self.temp_char = temp_service.get_characteristic('CurrentTemperature')
+        
+        # Get characteristics for humidity
         self.hum_char = hum_service.get_characteristic('CurrentRelativeHumidity')
 
     def update_sensor_data(self):
